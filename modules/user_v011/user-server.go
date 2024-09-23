@@ -1,4 +1,4 @@
-package group_02
+package user_v011
 
 import (
 	"net/http"
@@ -9,35 +9,35 @@ import (
 	"gorm.io/gorm"
 )
 
-type GroupServer interface {
+type UserServer interface {
 	Init()
 }
 
-type groupServer struct {
+type userServer struct {
 	apiRoutes *gin.RouterGroup
 	database  *gorm.DB
 	version   string
 }
 
-func NewGroupServer(apiR *gin.RouterGroup, db *gorm.DB, ver string) GroupServer {
+func NewUserServer(apiR *gin.RouterGroup, db *gorm.DB, ver string) UserServer {
 
-	return &groupServer{
+	return &userServer{
 		apiRoutes: apiR,
 		database:  db,
 		version:   ver,
 	}
 }
 
-func (s *groupServer) Init() {
+func (s *userServer) Init() {
 
-	groupControl := NewGroupController(s.database)
+	userControl := NewUserController(s.database)
 
-	s.apiRoutes.GET("/"+s.version+"/group", mid_auth.BasicAuth(), func(ctx *gin.Context) {
-		ctx.JSON(200, groupControl.FindAll())
+	s.apiRoutes.GET("/"+s.version+"/user", mid_auth.BasicAuth(), func(ctx *gin.Context) {
+		ctx.JSON(200, userControl.FindAll())
 	})
 
-	s.apiRoutes.GET("/"+s.version+"/group/:id", mid_auth.BasicAuth(), func(ctx *gin.Context) {
-		result, err := groupControl.FindById(ctx)
+	s.apiRoutes.GET("/"+s.version+"/user/:id", mid_auth.BasicAuth(), func(ctx *gin.Context) {
+		result, err := userControl.FindByNik(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"data": nil, "error": err.Error()})
 		} else {
@@ -45,8 +45,8 @@ func (s *groupServer) Init() {
 		}
 	})
 
-	s.apiRoutes.POST("/"+s.version+"/group", mid_auth.BasicAuth(), func(ctx *gin.Context) {
-		result, err := groupControl.Create(ctx)
+	s.apiRoutes.POST("/"+s.version+"/user", mid_auth.BasicAuth(), func(ctx *gin.Context) {
+		result, err := userControl.Create(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"data": nil, "error": err.Error()})
 		} else {
@@ -54,8 +54,8 @@ func (s *groupServer) Init() {
 		}
 	})
 
-	s.apiRoutes.PUT("/"+s.version+"/group", mid_auth.BasicAuth(), func(ctx *gin.Context) {
-		err := groupControl.Update(ctx)
+	s.apiRoutes.PUT("/"+s.version+"/user", mid_auth.BasicAuth(), func(ctx *gin.Context) {
+		err := userControl.Update(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
@@ -64,8 +64,8 @@ func (s *groupServer) Init() {
 
 	})
 
-	s.apiRoutes.DELETE("/"+s.version+"/group/:id", mid_auth.BasicAuth(), func(ctx *gin.Context) {
-		err := groupControl.Delete(ctx)
+	s.apiRoutes.DELETE("/"+s.version+"/user/:id", mid_auth.BasicAuth(), func(ctx *gin.Context) {
+		err := userControl.Delete(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {

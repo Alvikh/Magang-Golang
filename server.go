@@ -2,8 +2,7 @@ package main
 
 import (
 	"rsudlampung/helper"
-	"rsudlampung/versions/group_01"
-	"rsudlampung/versions/group_02"
+	"rsudlampung/modules"
 
 	"log"
 	"os"
@@ -11,11 +10,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
-
-var db_01 *gorm.DB
-var db_02 *gorm.DB
 
 func main() {
 
@@ -53,16 +48,8 @@ func main() {
 		ctx.JSON(200, "root path")
 	})
 
-	apiSistemRoutes := mainServer.Group("/sistem")
-	db_01 = helper.OpenDB(configEnv.DB, configEnv.SCHEMA, "v01")
-	db_02 = helper.OpenDB(configEnv.DB, configEnv.SCHEMA, "v02")
-
-	//initiate services
-	groupServer10 := group_01.NewGroupServer(apiSistemRoutes, db_01, "v01")
-	groupServer10.Init()
-
-	groupServer20 := group_02.NewGroupServer(apiSistemRoutes, db_02, "v02")
-	groupServer20.Init()
+	m := modules.NewVersion(configEnv, mainServer)
+	m.Run()
 
 	port := configEnv.Port
 	mainServer.Run(":" + port)
